@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">debtTracker</string>
+    <string name="enter_a_valid_amount">Enter a valid amount (e.g., 12.34)</string>
+    <string name="enter_an_amount">Enter an amount</string>
+    <string name="okay">Okay</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm_removal">Confirm Removal</string>
+    <string name="confirm_removal_msg">Are you sure you want to remove this debt?</string>
+    <string name="yeah_bro">Yeah bro</string>
+    <string name="nah">Nah, nvm</string>
+    <string name="back">Back</string>
+</resources>

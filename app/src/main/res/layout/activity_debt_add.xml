@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/etDebtName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Debt Name"
+        android:inputType="text|textNoSuggestions" />
+
+    <EditText
+        android:id="@+id/etDebtAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etDebtName"
+        android:layout_marginTop="20dp"
+        android:hint="Debt Amount"
+        android:inputType="number|numberDecimal"
+        android:padding="10dp" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etDebtAmount"
+        android:layout_marginTop="22dp"
+        android:gravity="center_horizontal"
+        android:text="Save" />
+</RelativeLayout>
