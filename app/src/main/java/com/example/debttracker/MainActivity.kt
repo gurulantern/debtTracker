@@ -1,27 +1,15 @@
 package com.example.debttracker
 
-import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
 
 class MainActivity : ComponentActivity() {
-
-    private val startDebtActivityForResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val updatedAmount = data?.getDoubleExtra("updatedAmount", 0.0) ?: 0.0
-                val debtName = data?.getStringExtra("debtName") ?: ""
-
-                DebtTracker.updateDebt(debtName, updatedAmount)
-                updateUI(layoutDebts)
-            }
-        }
 
     private val layoutDebts: LinearLayout by lazy {
         findViewById<LinearLayout>(R.id.layoutDebts)
@@ -31,18 +19,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Debts.loadFromSharedPreferences()
+
         val btnAddDebt: Button = findViewById(R.id.btnAddDebt)
 
         btnAddDebt.setOnClickListener {
-            // Start the DebtAddActivity when the "Add New Debt" button is clicked
-            val intent = Intent(this, DebtAddActivity::class.java)
-            startActivity(intent)
-
-            // Update the UI based on the debts in DebtTracker
-            updateUI(layoutDebts)
+            showAddDebtDialog()
         }
 
         // Update the UI based on the debts in DebtTracker
+        updateUI(layoutDebts)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Update the UI again when the activity resumes
         updateUI(layoutDebts)
     }
 
@@ -50,7 +42,7 @@ class MainActivity : ComponentActivity() {
         layoutDebts.removeAllViews()
 
         // Iterate through debts in DebtTracker and add UI elements
-        for ((debtName, debtAmount) in DebtTracker.getDebts()) {
+        for ((debtName, debtAmount) in Debts.getDebts()) {
             // Add a layout to contain each debt's views
             val debtLayout = LinearLayout(this)
             debtLayout.orientation = LinearLayout.HORIZONTAL
@@ -65,7 +57,7 @@ class MainActivity : ComponentActivity() {
                 val intent = Intent(this, DebtActivity::class.java)
                 intent.putExtra("debtName", debtName)
                 intent.putExtra("debtAmount", debtAmount)
-                startDebtActivityForResult.launch(intent)
+                startActivity(intent)
             }
 
             // Add a "Remove" button dynamically
@@ -80,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     setTitle(getString(R.string.confirm_removal))
                     setMessage(getString(R.string.confirm_removal_msg))
                     setPositiveButton(getString(R.string.yeah_bro)){ dialog, which ->
-                        DebtTracker.removeDebt(debtName)
+                        Debts.removeDebt(debtName)
                         updateUI(layoutDebts)
                     }
                     setNegativeButton(getString(R.string.nah)){ dialog, which ->
@@ -98,6 +90,42 @@ class MainActivity : ComponentActivity() {
 
             // Add the layout to the main layout
             layoutDebts.addView(debtLayout)
+        }
+    }
+
+    private fun showAddDebtDialog() {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val dialogLayout = inflater.inflate(R.layout.dialog_add_debt, null)
+        val etDebtName = dialogLayout.findViewById<EditText>(R.id.etDebtName)
+        val etDebtAmount = dialogLayout.findViewById<EditText>(R.id.etDebtAmount)
+
+        // Set an input filter to allow only numbers with up to two decimal places
+        val decimalFilter = DecimalDigitsInputFilter(2)
+        etDebtAmount.filters = arrayOf(decimalFilter)
+
+        builder.apply {
+            setTitle(getString(R.string.add_new_debt))
+            setPositiveButton(getString(R.string.save)) { dialog, which ->
+                // Handle positive button click
+                val debtName = etDebtName.text.toString()
+                val debtAmountStr = etDebtAmount.text.toString()
+
+                if (debtName.isNotEmpty() && debtAmountStr.isNotEmpty()) {
+                    val debtAmount = debtAmountStr.toDouble()
+                    Debts.addDebt(debtName, debtAmount)
+                    updateUI(layoutDebts)
+                } else {
+                    // Show an error message or handle invalid input
+                    // For example, you can set an error message on the EditText
+                    etDebtAmount.error = getString(R.string.enter_a_valid_amount)
+                }
+            }
+            setNegativeButton(getString(R.string.cancel)) { dialog, which ->
+                Log.d("Amount", "Cancel button clicked")
+            }
+            setView(dialogLayout)
+            show()
         }
     }
 }

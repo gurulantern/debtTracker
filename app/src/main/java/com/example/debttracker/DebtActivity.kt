@@ -35,7 +35,7 @@ class DebtActivity : AppCompatActivity() {
 
         val backButton = findViewById<ImageButton>(R.id.back_button)
         backButton.setOnClickListener {
-            setActivityResult(totalAmount, debtName) // Pass the updated amount here
+            finish()
         }
     }
 
@@ -73,7 +73,7 @@ class DebtActivity : AppCompatActivity() {
         addBtn.setOnClickListener {
             createAmountDialog { enteredAmount ->
                 // Handle positive action (adding amount)
-                totalAmount += enteredAmount
+                Debts.addToDebt(debtName, enteredAmount)
                 updateAmountTextView()
             }
         }
@@ -81,7 +81,7 @@ class DebtActivity : AppCompatActivity() {
         subBtn.setOnClickListener {
             createAmountDialog { enteredAmount ->
                 // Handle positive action (subtracting amount)
-                totalAmount -= enteredAmount
+                Debts.subtractFromDebt(debtName, enteredAmount)
                 updateAmountTextView()
             }
         }
@@ -90,7 +90,7 @@ class DebtActivity : AppCompatActivity() {
     private fun updateAmountTextView() {
         // Update the TextView with the formatted total amount
         val amountTextView = findViewById<TextView>(R.id.total_amount)
-        amountTextView.text = String.format("%.2f", totalAmount)
+        amountTextView.text = String.format("%.2f", Debts.getDebtAmount(debtName))
     }
 
     private fun setActivityResult(updatedAmount: Double, debtName: String) {
@@ -102,27 +102,3 @@ class DebtActivity : AppCompatActivity() {
     }
 }
 
-// Input filter to restrict input to numbers with specified decimal digits
-class DecimalDigitsInputFilter(digitsAfterZero: Int) : InputFilter {
-    private val pattern: String = if (digitsAfterZero > 0) {
-        String.format("[0-9]+(\\.[0-9]{0,%d})?", digitsAfterZero)
-    } else {
-        "[0-9]+"
-    }
-
-    override fun filter(
-        source: CharSequence?,
-        start: Int,
-        end: Int,
-        dest: Spanned?,
-        dstart: Int,
-        dend: Int
-    ): CharSequence? {
-        val newText = dest?.substring(0, dstart) + source?.substring(start, end) + dest?.substring(dend)
-        return if (newText.matches(pattern.toRegex())) {
-            null
-        } else {
-            ""
-        }
-    }
-}

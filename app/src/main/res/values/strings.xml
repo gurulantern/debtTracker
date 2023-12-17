@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">debtTracker</string>
+    <string name="app_name">Debt Tracker</string>
     <string name="enter_a_valid_amount">Enter a valid amount (e.g., 12.34)</string>
     <string name="enter_an_amount">Enter an amount</string>
     <string name="okay">Okay</string>
@@ -9,4 +9,7 @@
     <string name="yeah_bro">Yeah bro</string>
     <string name="nah">Nah, nvm</string>
     <string name="back">Back</string>
+    <string name="add_new_debt">Add New Debt</string>
+    <string name="save">Save</string>
+
 </resources>
